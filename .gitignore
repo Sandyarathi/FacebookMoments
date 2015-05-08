@@ -1,0 +1,8 @@
+/build/
+/bin/
+
+.classpath
+FacebookMoments/*.gradle
+.project
+.settings
+.gradle
