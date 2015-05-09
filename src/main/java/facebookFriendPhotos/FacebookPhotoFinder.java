@@ -25,6 +25,7 @@ public class FacebookPhotoFinder {
 	public List<Photo> findPhotoMoments(List<UPost> posts, FacebookClient fbClient){
 		Set<Photo> photoMoments = new HashSet<Photo>();
 		for(UPost post: posts){
+			System.out.println("Top post ids:"+post.getPostId() );
 			photoMoments.addAll(findCommonPics(post, fbClient));
 		}
 		return new ArrayList<Photo>(photoMoments);
