@@ -41,6 +41,8 @@ public class FController {
 
 	private static final String REDIRECT_URL = "http://localhost:8080/welcome.jsp/action";
 
+	private final static String STORY = "Version 8 WallCheck ";
+
 	/*--------------------------Welcome Page ---------------------------------*/
 	@SuppressWarnings("rawtypes")
 	@RequestMapping(value = "welcome.jsp/action", method = RequestMethod.GET)
@@ -52,13 +54,38 @@ public class FController {
 		FacebookClient fbClient = new DefaultFacebookClient(accessToken);
 		getUserPermissions(accessToken);
 
+		/** Publish story to FB wall Example **/
+		FacebookType publishMessageResponse = publishStory(STORY, fbClient);
+
+		/** Get Profile photos of Friends Example **/
+		List<Picture> friendProfilePhotos = getProfilePhotos(fbClient);
+
+		/** Get all posts of user Example **/
+		TreeMap<String, ArrayList<UPost>> allPosts = fb.getHighlights(fbClient);
+
+		/** Get common photos of user Example **/
+		List<Photo> photoMoments = getPhotoMoments(allPosts, fbClient);
+
+		if (!allPosts.isEmpty())
+			return new ResponseEntity<>(allPosts, HttpStatus.OK);
+		else
+			return new ResponseEntity<>(
+					"There are no Highlights to display currently",
+					HttpStatus.BAD_REQUEST);
+	}
+
+	public FacebookType publishStory(String story, FacebookClient fbClient) {
+
 		// to post a story to logged in users wall
-		String story = "Version 8 WallCheck ";
 		FacebookType publishMessageResponse = postStory.PostOnWall(fbClient,
 				story);
 		System.out.println("Published message ID: "
 				+ publishMessageResponse.getId());
+		return publishMessageResponse;
 
+	}
+
+	public List<Picture> getProfilePhotos(FacebookClient fbClient) {
 		// to get profile photos of friends of logged in user
 		List<Picture> friendProfilePhotos = friends.getProfilePhotos(fbClient);
 
@@ -67,8 +94,12 @@ public class FController {
 		for (Picture profilePicture : friendProfilePhotos) {
 			System.out.println(profilePicture.getUrl());
 		}
+		return friendProfilePhotos;
+	}
 
-		TreeMap<String, ArrayList<UPost>> allPosts = fb.getHighlights(fbClient);
+	public List<Photo> getPhotoMoments(
+			TreeMap<String, ArrayList<UPost>> allPosts, FacebookClient fbClient) {
+
 		if (!allPosts.isEmpty()) {
 			List<UPost> topPosts = fb.getTopPosts(allPosts, fbClient);
 			List<Photo> photoMoments = facebookPhotoFinder.findPhotoMoments(
@@ -78,16 +109,13 @@ public class FController {
 			for (Photo photo : photoMoments) {
 				System.out.println(photo.getSource());
 			}
-			return new ResponseEntity<>(topPosts, HttpStatus.OK);
+			return photoMoments;
 		}
+		return new ArrayList<Photo>();
 
-		else
-			return new ResponseEntity<>(
-					"There are no Highlights to display currently",
-					HttpStatus.BAD_REQUEST);
 	}
 
-	private void getUserPermissions(String accessToken) throws IOException {
+	public void getUserPermissions(String accessToken) throws IOException {
 		WebRequestor wr = new DefaultWebRequestor();
 		WebRequestor.Response permissions = wr
 				.executeGet("https://graph.facebook.com/me/permissions?access_token="
