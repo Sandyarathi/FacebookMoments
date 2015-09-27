@@ -41,7 +41,7 @@ public class FController {
 
 	private static final String REDIRECT_URL = "http://localhost:8080/welcome.jsp/action";
 
-	private final static String STORY = "Version 8 WallCheck ";
+	private final static String STORY = "Version 9 WallCheck ";
 
 	/*--------------------------Welcome Page ---------------------------------*/
 	@SuppressWarnings("rawtypes")

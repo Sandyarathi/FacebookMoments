@@ -83,6 +83,9 @@ public class FacebookPhotoFinder {
 		for (List<Photo> photoList : photoCollection) {
 			userPhotos.addAll(photoList);
 		}
+		//for(Photo photo: userPhotos){
+			//System.out.println(photo.getSource());
+		//}
 		return userPhotos;
 	}
 
